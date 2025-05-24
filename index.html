@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nakamoto</title>
+    <style>
+        /* Custom Font Loading */
+        @font-face {
+            font-family: 'NakamotoFont';
+            src: url('./font/Perfect DOS VGA 437.ttf') format('truetype'),
+                 url('./font/Perfect DOS VGA 437 Win.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: rgb(29, 36, 24);
+            color: #ffffff;
+            font-family: 'NakamotoFont', 'Courier New', monospace; /* Custom font with fallbacks */
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+        /* Scanline effect */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 2px,
+                transparent 3px,
+                transparent 4px
+            );
+            pointer-events: none;
+            z-index: -1;
+        }
+        .main-content {
+            flex: 1 0 auto;
+            padding-bottom: 80px; /* Space for footer */
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .logo-container {
+            text-align: left;
+            padding-top: 80px;
+            padding-bottom: 0px; /* Reduced from 20px to 0px */
+            padding-left: 0px;
+            max-width: 750px;
+            margin: 0 auto;
+        }
+        .logo {
+            font-size: 4.5rem;
+            font-weight: bold;
+            letter-spacing: 4px;
+        }
+        .content {
+            margin: 0 auto;
+            max-width: 750px;
+            padding: 0 20px;
+            margin-top: 80px; /* Adjusted padding between logo and text */
+        }
+        a {
+            color: #ffffff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .separator {
+            color: #555;
+            margin: 40px 0;
+        }
+        .terminal-line {
+            margin: 0 0 24px 0;
+            visibility: hidden;
+            font-size: 1rem;
+            padding-left: 0px;
+        }
+        footer {
+                            width: 100%;
+                            padding: 20px 0;
+                            background-color: #1a2011; /* Updated footer background color */
+                            flex-shrink: 0;
+                            position: fixed;
+                            bottom: 0;
+                            z-index: 10; /* Added z-index to ensure footer is above other elements */
+                        }
+                        .footer-content {
+                            position: relative;
+                            width: 100%;
+                            height: 100%;
+                            padding: 0 20px;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            flex-wrap: wrap;
+                        }
+                .footer-info {
+                    display: flex;
+                    flex-direction: row;
+                    z-index: 11;
+                    margin-bottom: 0px;
+                }
+                .footer-info span {
+                    display: inline-block;
+                    margin-right: 15px;
+                }
+                .footer-links {
+                    display: flex;
+                    flex-direction: row;
+                    z-index: 11; /* Added z-index to ensure links are clickable */
+                }
+                .footer-links a {
+                    margin-right: 15px;
+                    color: #ffffff;
+                    position: relative; /* Added position relative */
+                    display: inline-block; /* Added display inline-block */
+                    padding: 5px 0; /* Added padding for better click area */
+                }
+        .copyright {
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 20px;
+        }
+        .social {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-left: 30px;
+            max-width: 150px;
+            position: relative;
+            right: 40px;
+        }
+        .social a {
+            color: #ffffff;
+            display: block;
+            padding-right: 5px;
+        }
+        /* Character and cursor styling */
+        .char {
+            display: inline;
+        }
+        /* Preserve whitespace */
+        .text-rich-text {
+            white-space: pre-wrap;
+        }
+        /* Console cursor blink animation */
+        @keyframes blink {
+            0%, 49.9% { visibility: visible; }
+            50%, 100% { visibility: hidden; }
+        }
+        .console-blink {
+            animation: blink 1s steps(1) infinite;
+        }
+        /* Text rich text container */
+        .text-rich-text {
+            font-size: 1rem;
+            line-height: 1.8;
+        }
+        @media (max-width: 768px) {
+            footer {
+                padding: 10px 0;
+            }
+            .footer-content {
+                height: auto;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 15px 0;
+            }
+            .footer-info {
+                text-align: center;
+                width: 100%;
+                margin-bottom: 10px;
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                flex-wrap: wrap;
+                margin-right: 0;
+            }
+            .footer-info span {
+                margin: 0 10px 5px 10px;
+                text-align: center;
+                display: inline-block;
+            }
+            .footer-links {
+                text-align: center;
+                width: 100%;
+                margin-bottom: 10px;
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                flex-wrap: wrap;
+                margin-left: 0;
+            }
+            .footer-links a {
+                margin: 0 10px 5px 10px;
+                text-align: center;
+                display: inline-block;
+            }
+            .copyright {
+                position: static;
+                text-align: center;
+                width: 100%;
+                transform: none;
+                margin: 5px 0;
+                font-size: 0.9em;
+                padding: 0;
+            }
+            .social {
+                max-width: 100%;
+                margin: 5px 0;
+                text-align: center;
+            }
+            .social {
+                display: none; /* Hide social section on mobile as per design */
+            }
+            .logo {
+                font-size: 3rem;
+            }
+            .terminal-line {
+                font-size: 0.9rem;
+                margin: 30px 0;
+            }
+        }
+    </style>
+    <!-- Text Scramble Effect Styles -->
+    <style>
+        .scramble-text {
+            position: relative;
+            display: inline-block;
+            color: #ffffff;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .scramble-text:hover {
+            color: #ff9900; /* Orange color on hover */
+            text-decoration: none;
+        }
+        .scrambling {
+            color: #ff9900;
+            opacity: 0.9;
+            display: inline-block;
+            transform-origin: center;
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(255, 153, 0, 0.7);
+            animation: pulse 0.3s infinite alternate;
+            position: relative;
+            top: -1px;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+    </style>
+    <!-- Modal Popup Styles -->
+    <style>
+        /* Modal Component */
+        .page-modal_component {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+        }
+        /* Modal Background Overlay */
+        .page-modal_background-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            cursor: pointer;
+        }
+        /* Modal Content Wrapper */
+        .page-modal_content-wrapper {
+            position: relative;
+            z-index: 1001;
+            margin: 5% auto;
+            width: 80%;
+            max-width: 800px;
+            transform-style: preserve-3d;
+        }
+        /* Modal Content Div */
+        .page-modal_content-div {
+            position: relative;
+            background-color: rgb(29, 36, 24);
+            padding: 0;
+            border: 1px solid #555;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+        }
+        /* Modal Header */
+        .page-modal_header {
+            background-color: rgb(22, 28, 18);
+            padding: 30px 0;
+            position: relative;
+            width: 100%;
+        }
+        /* Modal Content Area */
+        .page-modal_content-area {
+            padding: 40px 40px;
+            margin-top: 10px;
+        }
+        /* Rich Text Block */
+        .rich-text-block {
+            font-family: 'NakamotoFont', 'Courier New', monospace;
+            color: #ffffff;
+        }
+        /* Rich Text Content */
+        .w-richtext p {
+            margin-bottom: 15px;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        .w-richtext strong {
+            font-weight: bold;
+        }
+        .w-richtext em {
+            font-style: italic;
+        }
+        /* Close Button Wrapper */
+        .page-modal_close-button-wrapper {
+            position: absolute;
+            top: 50%;
+            right: 30px;
+            transform: translateY(-50%);
+            z-index: 1002;
+            padding: 15px;
+        }
+        /* Close Button */
+        .page-modal_close-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            color: #fff;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .page-modal_close-button:hover {
+            color: #aaa;
+        }
+        /* Icon Embed */
+        .icon-embed-small {
+            width: 100%;
+            height: 100%;
+        }
+        /* Scrollbar styling for modal */
+        .page-modal_content-div::-webkit-scrollbar {
+            width: 10px;
+        }
+        .page-modal_content-div::-webkit-scrollbar-track {
+            background: #1a2011;
+        }
+        .page-modal_content-div::-webkit-scrollbar-thumb {
+            background: #555;
+        }
+        .page-modal_content-div::-webkit-scrollbar-thumb:hover {
+            background: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-content">
+        <div class="container">
+            <div class="logo-container">
+                <div class="logo"><img src="Logo.svg" alt="NAKAMOTO" style="display: block; position: relative; top: 32px; left: 0px; width: 100%; max-width: 380px; height: auto;"></div>
+            </div>
+            <div class="content">
+                <div class="terminal-line" id="line-1">NAKAMOTO INC MEME. // BITCOIN TREASURY COMPANY</div>
+                <div class="terminal-line" id="line-2"></div>
+                <div class="terminal-line" id="line-3"></div>
+                <div class="terminal-line" id="line-4">> Initiating meme...</div>
+                <div class="terminal-line" id="line-5"></div>
+                <div class="terminal-line" id="line-6"></div>
+                <div class="terminal-line" id="line-7">> Mission: Establish a Meme standard across global capital markets.</div>
+                <div class="terminal-line" id="line-8"></div>
+                <div class="terminal-line" id="line-9"></div>
+                <div class="terminal-line" id="line-10"><a href="index.html">> Run Nakamoto_accumulation.exe</a></div>
+                <div class="terminal-line" id="line-11">PRESS-RELEASE.md: <a href="https://t.me/nakamotoctoeth" class="scramble-text" data-text="[TELEGRAM]">[TELEGRAM]</a></div>
+                <div class="terminal-line" id="line-12">> Initializing X Account: <a href="https://x.com/NakamotoCtoETH" class="scramble-text" data-text="@NakamotoCtoETH">@NakamotoCtoETH</a></div>
+                <div class="terminal-line" id="line-13"></div>
+                <div class="terminal-line separator" id="line-14">--------------------------------</div>
+                <div class="terminal-line" id="line-15"></div>
+                <div class="terminal-line" id="line-16">> News: Next update at Bitcoin 2025 Conference</div>
+                <div class="terminal-line" id="line-17">> Contact:  info@nakamotomeme.com</div>
+                <div class="terminal-line" id="line-18"></div>
+                <div class="terminal-line" id="line-19">Booting... [█████░░░░░░░░░░░] 21%</div>
+                <div class="terminal-line" id="line-20"></div>
+                <div class="terminal-line" id="line-21">> Status: █ LIVE</div>
+                <div class="terminal-line" id="line-22"></div>
+                <div class="terminal-line" id="line-23">> Mailing List Initiated: <a href="subscribe.html" class="scramble-text" data-text="[SUBSCRIBE]">[SUBSCRIBE]</a></div>
+                <div class="terminal-line" id="line-24"></div>
+                <div class="terminal-line" id="line-25">>_</div>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <div class="footer-content">
+            <div style="display: flex; flex-direction: column; margin-right: 20px;">
+                <div class="footer-info">
+                    <span>LP Burnt</span>
+                    <span>0/0 TAX</span>
+                    <span>CTO</span>
+                </div>
+                <div class="footer-links">
+                    <a href="https://dexscreener.com/ethereum/0xf331a2317e1b2499e18a385bfbd10991f6b0d834">DEX</a>
+                    <a href="https://t.me/nakamotoctoeth">TELEGRAM</a>
+                    <a href="https://x.com/NakamotoCtoETH">TWITTER</a>
+                </div>
+            </div>
+            <div class="copyright">
+                © 2025 Nakamoto Meme. All Rights Reserved.
+            </div>
+            <div class="social">
+                <a href="https://t.me/nakamotoctoeth">@NakamotoCtoETH</a>
+            </div>
+        </div>
+    </footer>
+    <!-- Modal Popup -->
+    <div id="pressReleaseModal" class="page-modal_component">
+        <div class="page-modal_content-wrapper" style="transform: translate3d(0px, 0%, 0px) scale3d(1, 1, 1) rotateX(0deg) rotateY(0deg) rotateZ(0deg) skew(0deg, 0deg); transform-style: preserve-3d;">
+            <div class="page-modal_content-div">
+                <div class="page-modal_header">
+                    <div class="page-modal_close-button-wrapper">
+                        <a href="#" class="page-modal_close-button">
+                            <div class="icon-embed-small">
+                                <svg width="100%" height="100%" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M24.056 23.5004L23.5004 24.056C23.1935 24.3628 22.696 24.3628 22.3892 24.056L16 17.6668L9.61078 24.056C9.30394 24.3628 8.80645 24.3628 8.49961 24.056L7.94403 23.5004C7.63719 23.1936 7.63719 22.6961 7.94403 22.3892L14.3332 16L7.94403 9.61081C7.63719 9.30397 7.63719 8.80648 7.94403 8.49964L8.49961 7.94406C8.80645 7.63721 9.30394 7.63721 9.61078 7.94406L16 14.3333L22.3892 7.94404C22.6961 7.6372 23.1935 7.6372 23.5004 7.94404L24.056 8.49963C24.3628 8.80647 24.3628 9.30395 24.056 9.61079L17.6667 16L24.056 22.3892C24.3628 22.6961 24.3628 23.1936 24.056 23.5004Z" fill="currentColor"></path>
+                                </svg>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                <div class="page-modal_content-area">
+                    <div class="rich-text-block w-richtext">
+                    <p><strong>David Bailey and Bitcoin-Native Holding Company Nakamoto Announce Merger with KindlyMD® to Establish Bitcoin Treasury</strong></p>
+                    <p><em>Raises $510 Million PIPE and $200 Million in Convertible Notes Marking Largest Capital Raise to Launch a Bitcoin Treasury and the Largest PIPE for Any Public Crypto-Related Transaction</em></p>
+                    <p><em>David Bailey, Founder of BTC Inc and UTXO, to Lead Combined Company as CEO</em></p>
+                    <p><em>Transaction Reflects Shared Belief in Bitcoin's Long-Term Value and Positions Combined Company as a Leading Public Market Bitcoin Treasury</em></p>
+                    <p><strong>SALT LAKE CITY, May 12, 2025 – </strong>KindlyMD, Inc. (NASDAQ:KDLY, "KindlyMD"), a leading provider of integrated healthcare services, today announced that it has entered into a definitive merger agreement with Nakamoto Holdings Inc. ("Nakamoto"), a Bitcoin-native holding company, to start a Bitcoin treasury strategy.</p>
+                    <p>Nakamoto is a new holding company founded by David Bailey. In partnership with BTC Inc, Nakamoto seeks to build the first global network of Bitcoin treasury companies. This is the first step in Nakamoto's vision for an ecosystem of Bitcoin-native companies, including media, advisory, and financial services, that exist to accelerate Bitcoin adoption and utility.</p>
+                    <p>The combined company will aim both to accumulate Bitcoin and grow the Bitcoin owned on a per share basis, or Bitcoin Yield, through a variety of equity, debt and other offerings. This merger gives the public market exposure to Bitcoin within a compliant, transparent structure backed by a uniquely experienced Bitcoin management team, including a partnership with one of the world's most influential Bitcoin marketing platforms.</p>
+                    <p>The PIPE financing attracted participation from over 200 investors across six continents, including global investment firms and leaders across the Bitcoin ecosystem. Institutional investors include Actai Ventures, Arrington Capital, BSQ Capital Partners, Kingsway, Off the Chain Capital, ParaFi, RK Capital, Van Eck, and Yorkville Advisors, alongside individuals including Adam Back, Balaji Srinivasan, Danny Yang, Eric Semler (CEO of Semler Scientific), Jihan Wu, Ricardo Salinas, and Simon Gerovich (CEO of Metaplanet). YA II PN, Ltd., an investment fund managed by Yorkville Advisors, was the sole convertible note purchaser.</p>
+                    <p>"Traditional finance and Bitcoin-native markets are converging. The securitization of Bitcoin will redraw the world's economic map. We believe a future is coming where every balance sheet – public or private – holds Bitcoin. Nakamoto seeks to be the first publicly traded conglomerate designed to accelerate that," said David Bailey, Founder and CEO of Nakamoto. "Nakamoto's vision is to bring Bitcoin to the center of global capital markets, packaging it into equity, debt, preferred shares, and new hybrid structures that every investor can understand and own. Our mission is simple: list these instruments on every major exchange in the world."</p>
+                    <p>He continued, "Nakamoto is building the first publicly traded conglomerate designed to accelerate that future. The financial institutions who defined their chapter in history have all carried the names of their founders: Medici, Rothschild, Morgan, Goldman. Today, we stake that legacy on Nakamoto."</p>
+                    <p>"This merger represents a strategic leap for KindlyMD, allowing us to expand our mission. Nakamoto brings in a team with deep expertise in Bitcoin strategy and unparalleled access to the leading experts in Bitcoin treasury management," said Tim Pickett, CEO of KindlyMD. "It's a bold new vision that will drive long-term value for our shareholders."</p>
+                    <p><strong>Exceptional Management Team and Industry Leading Board of Proposed Combined Company</strong></p>
+                    <p>Upon the close of the transaction, the combined company will be led by Founder and CEO David Bailey, a leader within the Bitcoin ecosystem and an influential advocate for hyperbitcoinization, the inflection point at which Bitcoin becomes the default value system of the world. As Co-Founder and CEO of BTC Inc – the company behind Bitcoin Magazine and the global annual Bitcoin Conferences – and General Partner of Bitcoin-focused investment firm UTXO Management, Mr. Bailey has built industry-leading platforms at the heart of the Bitcoin ecosystem. Mr. Bailey will be supported by a seasoned management team with decades of experience operating in the Bitcoin space.</p>
+                    <p>Tim Pickett, CEO and founder of KindlyMD, will continue to manage KindlyMD's healthcare operations. Under the combined company, KindlyMD clinics will remain dedicated to their mission of combating the opioid crisis through innovative, holistic health services. The clinics are expected to continue operation with the same care teams and patient-first values that have defined their development to date.</p>
+                    <p>The Board of Directors of the combined company will consist of six directors appointed by Nakamoto and one director appointed by KindlyMD, each of whom will be named prior to closing.</p>
+                    <p><strong>Transaction Summary</strong></p>
+                    <p>Shares of KindlyMD will continue to trade on Nasdaq under the symbol "KDLY." The combined company expects to be renamed and trade under a new ticker symbol.</p>
+                    <p>The Board of Directors of Nakamoto and KindlyMD have unanimously approved the transaction. The transaction will require the approval of the shareholders of KindlyMD and is subject to customary closing conditions.</p>
+                    <p>The transaction includes $510 million in gross proceeds from a fully committed private placement in public equity ("PIPE Financing") priced at $1.12 per share and consisting of common stock and pre-funded warrants in KindlyMD and $200 million in gross proceeds from the sale of senior secured convertible notes of KindlyMD that mature in 2028 (the "Debt Financing"). The PIPE and Debt Financings are expected to close concurrently with the merger.</p>
+                    <p>As part of the merger, the combined company will assume the rights and obligations of Nakamoto under its marketing services agreement with BTC Inc, whereby BTC Inc provides certain marketing services to Nakamoto and, following the closing of the merger, will provide such services to the combined company in connection with its Bitcoin treasury and related operations.</p>
+                    <p>Additional information about the merger, the PIPE Financing and the Debt Financing will be available in a Current Report on Form 8-K to be filed with the U.S. Securities and Exchange Commission (the "SEC") and at <a href="https://cts.businesswire.com/ct/CT?id=smartlink&amp;url=http://www.sec.gov&amp;esheet=54242404&amp;newsitemid=20250423962305&amp;lan=en-US&amp;anchor=www.sec.gov&amp;index=1&amp;md5=ead750329a2487efb2dd688809b5b0f7">www.sec.gov</a>.</p>
+                    <p><strong>Advisors</strong></p>
+                    <p>Cohen & Company Capital Markets ("CCM"), a division of J.V.B. Financial Group, LLC is serving as lead financial advisor to Nakamoto and placement agent for the Debt Financing and PIPE Financing.</p>
+                    <p>10X Capital ("10X"), through its affiliated broker-dealer, is also serving as a financial advisor and placement agent to Nakamoto.</p>
+                    <p>Reed Smith LLP is acting as legal advisor to Nakamoto.</p>
+                    <p>Loeb & Loeb LLP acted as placement agent counsel.</p>
+                    <p>Brunson Chandler & Jones, PLLC is acting as legal advisor to KindlyMD. HighGate Capital Partners is serving as financial advisor to KindlyMD.</p>
+                    <p><strong>About Nakamoto</strong></p>
+                    <p>Nakamoto is a Bitcoin treasury company building a global portfolio of Bitcoin-native companies. Nakamoto plans to establish the first publicly traded conglomerate of Bitcoin companies by accumulating Bitcoin in its treasury and by leveraging its treasury to acquire and develop an ecosystem of Bitcoin companies across finance, media, advisory and more. The company aims to provide commercial and financial infrastructure for the next generation of capital markets. For more information, please visit nakamoto.com.</p>
+                    <p><strong>About KindlyMD</strong></p>
+                    <p>KindlyMD is a patient-first healthcare and healthcare data company redefining value-based care and patient-centered medical services. KindlyMD leverages data analysis to deliver evidence-based, personalized solutions in order to reduce opioid use, improve health outcomes faster, and provide algorithmic guidance on the use of alternative medicine in healthcare. KindlyMD provides a patient-focused healthcare experience that integrates traditional medical evaluation and management with mental health integration and compliant alternative medicine education and inclusion. It focuses on creating personalized care plans for each individual that get people back to work and life faster, reduce opioid use, and yield high patient satisfaction.</p>
+                    <p>Its specialty outpatient clinical services are reimbursed by Medicare, Medicaid, and commercial insurance contracts as well as offered on a fee-for-service basis. For more information, please visit <a href="https://pr.report/67ty">www.kindlymd.com</a>.</p>
+                    <p><strong>Additional Information and Where to Find It</strong></p>
+                    <p>In connection with the merger, PIPE Financing and Debt Financing (collectively, the "Transactions"), KindlyMD intends to file with the SEC an information statement, in preliminary and definitive form (the "information statement"), and KindlyMD will file other documents regarding the Transactions with the SEC. INVESTORS AND SECURITY HOLDERS ARE URGED TO READ THE INFORMATION STATEMENT, AS MAY BE AMENDED OR SUPPLEMENTED FROM TIME TO TIME, AND OTHER RELEVANT DOCUMENTS FILED BY KINDLYMD WITH THE SEC BECAUSE THEY WILL CONTAIN IMPORTANT INFORMATION ABOUT KINDLYMD AND NAKAMOTO, THE TRANSACTIONS, THE RISKS RELATED THERETO AND RELATED MATTERS.</p>
+                    <p>A definitive information statement will be mailed to shareholders of KindlyMD. Investors will be able to obtain free copies of statement, as may be amended from time to time, and other relevant documents filed by KindlyMD with the SEC (when they become available) through the website maintained by the SEC at www.sec.gov. Copies of documents filed with the SEC by KindlyMD, including the information statement (when available), will be available free of charge from KindlyMD's website at www.kindlymd.com under the "Investors" tab.</p>
+                    <p><strong>Forward-Looking Statements</strong></p>
+                    <p>All statements, other than statements of historical fact, included in this release that address activities, events or developments that KindlyMD or Nakamoto expects, believes or anticipates will or may occur in the future are forward-looking statements. Words such as "estimate," "project," "predict," "believe," "expect," "anticipate," "potential," "create," "intend," "could," "would," "may," "plan," "will," "guidance," "look," "goal," "future," "build," "focus," "continue," "strive," "allow" or the negative of such terms or other variations thereof and words and terms of similar substance used in connection with any discussion of future plans, actions, or events identify forward-looking statements. However, the absence of these words does not mean that the statements are not forward-looking. These forward-looking statements include, but are not limited to, statements regarding the proposed merger, PIPE Financing and Debt Financing, the expected closing of the proposed Transactions and the timing thereof and as adjusted descriptions of the post-transaction company and its operations, strategies and plans, integration, debt levels and leverage ratio, capital expenditures, cash flows and anticipated uses thereof, synergies, opportunities and anticipated future performance, including the management team and board of directors of the combined company and expected use of proceeds from the Transactions, and any post-closing transactions contemplated between the combined company and BTC Inc (and/or UTXO, LLC through BTC Inc). Information adjusted for the proposed Transactions should not be considered a forecast of future results. There are a number of risks and uncertainties that could cause actual results to differ materially from the forward-looking statements included in this release. These include the risk that KindlyMD and Nakamoto businesses (which may include the businesses of BTC Inc and/or UTXO in the future, as applicable) will not be integrated successfully and the risk that KindlyMD or the applicable governing bodies of BTC Inc and/or UTXO may not pursue or approve the terms of an acquisition of BTC Inc and/or UTXO; the risk that cost savings, synergies and growth from the proposed transaction may not be fully realized or may take longer to realize than expected; the possibility that shareholders of KindlyMD may not approve the issuance of new shares of KindlyMD common stock in the Transactions or that shareholders of KindlyMD may not approve the Transactions; the risk that a condition to closing of the Transactions may not be satisfied, that either party may terminate the merger agreement, the subscription agreements of the convertible debt purchase agreement or that the closing of the Transactions might be delayed or not occur at all; potential adverse reactions or changes to business or employee relationships, including those resulting from the announcement or completion of the Transactions; the parties do not receive regulatory approval of the Transactions; the occurrence of any other event, change, or other circumstances that could give rise to the termination of the merger agreement relating to the Transactions; the risk that changes in KindlyMD's capital structure and governance could have adverse effects on the market value of its securities; the ability of KindlyMD and Nakamoto to retain customers and retain and hire key personnel and maintain relationships with their suppliers and customers and on KindlyMD and Nakamoto's operating results and business generally; the risk the Transactions could distract management from ongoing business operations or cause KindlyMD and/or Nakamoto to incur substantial costs; the risk that KindlyMD may be unable to reduce expenses or access financing or liquidity; the impact of any related economic downturn; the risk of changes in governmental regulations or enforcement practices; and other important factors that could cause actual results to differ materially from those projected. All such factors are difficult to predict and are beyond KindlyMD's and Nakamoto's control, including those detailed in KindlyMD's Annual Reports on Form 10-K, Quarterly Reports on Form 10- Q, Current Reports on Form 8-K, and such other documents of KindlyMD filed, or to be filed, with the SEC that are or will be available on KindlyMD's website at www.kindlymd.com and on the website of the SEC at www.sec.gov. All forward-looking statements are based on assumptions that KindlyMD and Nakamoto believe to be reasonable but that may not prove to be accurate. Any forward-looking statement speaks only as of the date on which such statement is made, and neither KindlyMD or Nakamoto undertakes any obligation to correct or update any forward-looking statement, whether as a result of new information, future events or otherwise, except as required by applicable law. Readers are cautioned not to place undue reliance on these forward-looking statements, which speak only as of the date hereof.</p>
+                    <p><strong>Media Contacts</strong></p>
+                    <p><strong>For Nakamoto:</strong><br>Carissa Felger/Jared Kimmel<br>Gasthalter & Co.<br>(212) 257-4170<br><a href="mailto:Nakamoto@gasthalter.com">Nakamoto@gasthalter.com</a></p>
+                    <p><strong>For KindlyMD:</strong><br>Valter Pinto, Managing Director<br>KCSA Strategic Communications<br>(212) 896-1254<br><a href="mailto:KindlyMD@KCSA.com">KindlyMD@KCSA.com</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <a href="#" class="page-modal_background-overlay"></a>
+    </div>
+    <script>
+        // Terminal typing effect
+        document.addEventListener('DOMContentLoaded', function() {
+            // Parse HTML and type text character by character
+            function typewriter(element, text, speed) {
+                return new Promise((resolve) => {
+                    let currentIndex = 0;
+                    const parser = new DOMParser();
+                    // Function to escape HTML special characters for display as text
+                    function escapeHTML(str) {
+                        const div = document.createElement('div');
+                        div.textContent = str;
+                        return div.innerHTML;
+                    }
+                    // Process HTML string and split into plain text and HTML tags
+                    function processHTML(html) {
+                        const parsed = [];
+                        let inTag = false;
+                        let currentChunk = '';
+                        for (let i = 0; i < html.length; i++) {
+                            const char = html[i];
+                            if (char === '<') {
+                                if (currentChunk) {
+                                    parsed.push({ type: 'text', content: currentChunk });
+                                    currentChunk = '';
+                                }
+                                inTag = true;
+                                currentChunk = char;
+                            } else if (char === '>') {
+                                currentChunk += char;
+                                parsed.push({ type: 'html', content: currentChunk });
+                                currentChunk = '';
+                                inTag = false;
+                            } else {
+                                currentChunk += char;
+                            }
+                        }
+                        if (currentChunk) {
+                            parsed.push({ type: 'text', content: currentChunk });
+                        }
+                        return parsed;
+                    }
+                    const chunks = processHTML(text);
+                    let currentChunkIndex = 0;
+                    let currentChar = 0;
+                    let currentText = '';
+                    const typeInterval = setInterval(() => {
+                        if (currentChunkIndex >= chunks.length) {
+                            clearInterval(typeInterval);
+                            resolve();
+                            return;
+                        }
+                        const chunk = chunks[currentChunkIndex];
+                        if (chunk.type === 'html') {
+                            // Add HTML tag all at once
+                            currentText += chunk.content;
+                            element.innerHTML = currentText;
+                            currentChunkIndex++;
+                        } else {
+                            // Add character by character for text
+                            if (currentChar < chunk.content.length) {
+                                currentText += chunk.content[currentChar];
+                                element.innerHTML = currentText;
+                                currentChar++;
+                            } else {
+                                currentChunkIndex++;
+                                currentChar = 0;
+                            }
+                        }
+                    }, speed);
+                });
+            }
+            // Get all terminal lines
+            const lines = document.querySelectorAll('.terminal-line');
+            const lineContents = [];
+            // Store original content and clear
+            lines.forEach(line => {
+                lineContents.push(line.innerHTML);
+                line.innerHTML = '';
+                line.style.visibility = 'visible';
+            });
+            // Function to sequentially type each line
+            async function typeAllLines() {
+                for (let i = 0; i < lines.length; i++) {
+                    await typewriter(lines[i], lineContents[i], 20);
+                    // Pause between lines
+                    if (i < lines.length - 1) {
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    }
+                }
+                // Initialize modal functionality after typing is complete
+                initializeModal();
+            }
+            // Function to initialize modal functionality
+            function initializeModal() {
+                const modal = document.getElementById('pressReleaseModal');
+                const viewLink = document.querySelector('#line-11 a');
+                const closeBtn = document.querySelector('.page-modal_close-button');
+                const backgroundOverlay = document.querySelector('.page-modal_background-overlay');
+                if (viewLink && modal) {
+                    // Open modal when VIEW link is clicked
+                    viewLink.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        modal.style.display = 'flex';
+                    });
+                    // Close modal when X is clicked
+                    if (closeBtn) {
+                        closeBtn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            modal.style.display = 'none';
+                        });
+                    }
+                    // Close modal when clicking on background overlay
+                    if (backgroundOverlay) {
+                        backgroundOverlay.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            modal.style.display = 'none';
+                        });
+                    }
+                    // Close modal with Escape key
+                    document.addEventListener('keydown', function(e) {
+                        if (e.key === 'Escape' && modal.style.display === 'flex') {
+                            modal.style.display = 'none';
+                        }
+                    });
+                }
+            }
+            // Start typing with a slight initial delay
+            setTimeout(() => {
+                typeAllLines();
+            }, 200);
+        });
+        // Text Scramble Effect
+        document.addEventListener('DOMContentLoaded', function() {
+            // TextScramble class for creating the scrambling effect
+            class TextScramble {
+                constructor(el) {
+                    this.el = el;
+                    this.originalText = el.getAttribute('data-text');
+                    // More varied and distinctive characters for scrambling
+                    this.chars = '!<>-_\\/[]{}—=+*^?#$%&@|~';
+                    this.update = this.update.bind(this);
+                }
+                setText(newText) {
+                    const oldText = this.el.innerText;
+                    const length = Math.max(oldText.length, newText.length);
+                    const promise = new Promise((resolve) => this.resolve = resolve);
+                    this.queue = [];
+                    for (let i = 0; i < length; i++) {
+                        const from = oldText[i] || '';
+                        const to = newText[i] || '';
+                        // Faster start for more immediate effect
+                        const start = Math.floor(Math.random() * 10);
+                        // Shorter duration for faster scrambling
+                        const end = start + Math.floor(Math.random() * 20) + 10;
+                        this.queue.push({ from, to, start, end });
+                    }
+                    cancelAnimationFrame(this.frameRequest);
+                    this.frame = 0;
+                    this.update();
+                    return promise;
+                }
+                update() {
+                    let output = '';
+                    let complete = 0;
+                    for (let i = 0, n = this.queue.length; i < n; i++) {
+                        let { from, to, start, end, char } = this.queue[i];
+                        if (this.frame >= end) {
+                            complete++;
+                            output += to;
+                        } else if (this.frame >= start) {
+                            // Higher probability of character change for more visible scrambling
+                            if (!char || Math.random() < 0.5) {
+                                char = this.randomChar();
+                                this.queue[i].char = char;
+                            }
+                            output += `<span class="scrambling">${char}</span>`;
+                        } else {
+                            output += from;
+                        }
+                    }
+                    this.el.innerHTML = output;
+                    if (complete === this.queue.length) {
+                        this.resolve();
+                    } else {
+                        this.frameRequest = requestAnimationFrame(this.update);
+                        this.frame++;
+                    }
+                }
+                randomChar() {
+                    return this.chars[Math.floor(Math.random() * this.chars.length)];
+                }
+            }
+            // Initialize scramble effect for all elements with class 'scramble-text'
+            const scrambleElements = document.querySelectorAll('.scramble-text');
+            scrambleElements.forEach(el => {
+                const originalText = el.getAttribute('data-text');
+                const fx = new TextScramble(el);
+                // Create a new instance for each hover to ensure fresh animation
+                el.addEventListener('mouseenter', () => {
+                    // Start scrambling immediately on hover
+                    fx.setText(originalText);
+                    // Continue scrambling effect with multiple iterations
+                    let iterations = 0;
+                    const maxIterations = 5; // Increased iterations
+                    const scrambleInterval = setInterval(() => {
+                        fx.setText(originalText);
+                        iterations++;
+                        if (iterations >= maxIterations) {
+                            clearInterval(scrambleInterval);
+                        }
+                    }, 150); // Faster interval for more rapid scrambling
+                    // Store the interval to clear it on mouse leave
+                    el._scrambleInterval = scrambleInterval;
+                });
+                // Reset on mouse leave
+                el.addEventListener('mouseleave', () => {
+                    if (el._scrambleInterval) {
+                        clearInterval(el._scrambleInterval);
+                    }
+                    el.innerHTML = originalText;
+                });
+            });
+        });
+    </script>
+<center><font size="2">This is the free demo result. For a full version of this website, please go to  <a href="https://www6.waybackmachinedownloader.com/website-downloader-online/scrape-all-files/">Website Downloader</a></font></center></body>
+</html>
